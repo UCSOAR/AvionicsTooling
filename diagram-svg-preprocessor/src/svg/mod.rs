@@ -1,2 +1,3 @@
+pub mod modifier;
 pub mod parser;
-pub mod xml_attributes;
+pub mod svg_attributes;

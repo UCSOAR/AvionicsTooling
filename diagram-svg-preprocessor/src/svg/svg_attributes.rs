@@ -1,15 +1,19 @@
 use std::collections::HashMap;
 
 #[derive(Debug, PartialEq)]
-pub struct XmlAttributes(HashMap<String, String>);
+pub struct SvgAttributes(HashMap<String, String>);
 
-impl XmlAttributes {
+impl SvgAttributes {
     pub fn new() -> Self {
         Self(HashMap::new())
     }
 
-    pub fn set_attribute(&mut self, attr_name: String, attr_value: String) {
-        self.0.insert(attr_name, attr_value);
+    pub fn set_attribute(&mut self, attr_name: &str, attr_value: &str) {
+        self.0.insert(attr_name.to_string(), attr_value.to_string());
+    }
+
+    pub fn get_attribute(&self, attr_name: &str) -> Option<&String> {
+        self.0.get(attr_name.to_string().as_str())
     }
 
     pub fn serialize(&self) -> String {
@@ -30,11 +34,11 @@ impl XmlAttributes {
 }
 
 mod test {
-    use super::XmlAttributes;
+    use super::SvgAttributes;
 
     #[test]
     fn test_serialize_no_attributes() {
-        let attributes = XmlAttributes::new();
+        let attributes = SvgAttributes::new();
         let expected = r#"<svg>"#;
 
         assert_eq!(expected, attributes.serialize().as_str())
@@ -42,9 +46,9 @@ mod test {
 
     #[test]
     fn test_serialize_with_attributes() {
-        let mut attributes = XmlAttributes::new();
-        attributes.set_attribute("class".to_string(), "SOAR".to_string());
-        attributes.set_attribute("name".to_string(), "fan".to_string());
+        let mut attributes = SvgAttributes::new();
+        attributes.set_attribute("class", "SOAR");
+        attributes.set_attribute("name", "fan");
 
         let serialized = attributes.serialize();
 

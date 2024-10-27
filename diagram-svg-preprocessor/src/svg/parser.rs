@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Result};
 use regex::Regex;
 
-use super::xml_attributes::XmlAttributes;
+use super::svg_attributes::SvgAttributes;
 
 /**
  * Pattern for matching the opening tag of an SVG element.
@@ -12,17 +12,17 @@ use super::xml_attributes::XmlAttributes;
 const SVG_OPEN_TAG_PATTERN: &str = r#"(<svg\s?+)([^>]*)(>)"#;
 
 /**
- * Pattern for matching XML attributes of a tag
+ * Pattern for matching SVG tag attributes
  * Group 1: The attribute name
  * Group 2: The attribute value
  */
-const XML_ATTRIBUTE_PATTERN: &str = r#"(\w+)=["\']([^"\']+)["\']"#;
+const SVG_ATTRIBUTE_PATTERN: &str = r#"(\w+)=["\']([^"\']+)["\']"#;
 
-pub fn parse_attributes(raw_svg_text: &str) -> Result<(XmlAttributes, String)> {
+pub fn parse_attributes(raw_svg_text: &str) -> Result<(SvgAttributes, String)> {
     let svg_open_tag_regex =
         Regex::new(SVG_OPEN_TAG_PATTERN).expect("Failed to parse SVG open tag pattern.");
-    let xml_attr_regex =
-        Regex::new(XML_ATTRIBUTE_PATTERN).expect("Failed to parse XML attribute pattern.");
+    let svg_attr_regex =
+        Regex::new(SVG_ATTRIBUTE_PATTERN).expect("Failed to parse XML attribute pattern.");
 
     let svg_open_tag_caps = svg_open_tag_regex
         .captures(raw_svg_text)
@@ -33,25 +33,25 @@ pub fn parse_attributes(raw_svg_text: &str) -> Result<(XmlAttributes, String)> {
     ))?;
 
     let unparsed_attributes = svg_open_tag_caps.get(2).map_or("", |a| a.as_str());
-    let mut attributes = XmlAttributes::new();
+    let mut attributes = SvgAttributes::new();
 
-    for (_, [attr_name, attr_value]) in xml_attr_regex
+    for (_, [attr_name, attr_value]) in svg_attr_regex
         .captures_iter(&unparsed_attributes)
         .map(|c| c.extract())
     {
-        attributes.set_attribute(attr_name.to_string(), attr_value.to_string());
+        attributes.set_attribute(attr_name, attr_value);
     }
 
     Ok((attributes, svg_tag_text.as_str().to_string()))
 }
 
 mod test {
-    use crate::svg::{parser::parse_attributes, xml_attributes::XmlAttributes};
+    use crate::svg::{parser::parse_attributes, svg_attributes::SvgAttributes};
 
     #[test]
     fn test_svg_no_attributes_is_ok() {
         let input = r#"<svg>"#;
-        let expected = XmlAttributes::new();
+        let expected = SvgAttributes::new();
         let (attributes, _) = parse_attributes(input).unwrap();
 
         assert_eq!(attributes, expected);
@@ -71,9 +71,9 @@ mod test {
         let input = r#"<svg class='hello' name="SOAR">"#;
         let (attributes, _) = parse_attributes(input).unwrap();
 
-        let mut expected = XmlAttributes::new();
-        expected.set_attribute("class".to_string(), "hello".to_string());
-        expected.set_attribute("name".to_string(), "SOAR".to_string());
+        let mut expected = SvgAttributes::new();
+        expected.set_attribute("class", "hello");
+        expected.set_attribute("name", "SOAR");
 
         assert_eq!(attributes, expected);
     }
