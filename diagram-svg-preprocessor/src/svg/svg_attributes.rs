@@ -17,19 +17,13 @@ impl SvgAttributes {
     }
 
     pub fn serialize(&self) -> String {
-        let mut curr = "<svg ".to_string();
-
         let serialized_attributes = self
             .0
             .iter()
-            .map(|(attr_name, attr_value)| format!("{}='{}' ", attr_name, attr_value))
+            .map(|(attr_name, attr_value)| format!(" {}='{}'", attr_name, attr_value))
             .collect::<String>();
 
-        curr.push_str(serialized_attributes.as_str());
-        curr.pop();
-        curr.push('>');
-
-        curr
+        format!("<svg{}>", serialized_attributes)
     }
 }
 
