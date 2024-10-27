@@ -1,4 +1,6 @@
 {
   "style_file_path": "style.css",
+  "svg_file_path": "Background-Light.svg",
+  "output_file_path": "Diagram.svelte",
   "color_mappings": {}
 }
