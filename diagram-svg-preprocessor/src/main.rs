@@ -6,8 +6,23 @@ mod svg;
 use anyhow::Result;
 use config::Config;
 use options::Options;
+use std::io::Write;
 use svelte::transpiler::Transpiler;
 use svg::{css_color::CssColor, modifier::Modifier, parser::Parser, var_color::VarColor};
+
+macro_rules! readln {
+    ($input:expr) => {
+        std::io::stdout().flush()?;
+        std::io::stdin().read_line($input)?;
+    };
+}
+
+macro_rules! clear {
+    () => {
+        print!("\x1B[2J\x1B[H");
+        std::io::stdout().flush()?;
+    };
+}
 
 fn main() -> Result<()> {
     println!("SOAR Diagram SVG Preprocessor CLI");
@@ -33,10 +48,7 @@ fn main() -> Result<()> {
         print!("Select an option: ");
 
         let mut input = String::new();
-
-        std::io::stdin()
-            .read_line(&mut input)
-            .expect("Failed to read input.");
+        readln!(&mut input);
 
         let option = Options::parse(input.trim());
 
@@ -68,7 +80,7 @@ fn main() -> Result<()> {
                 };
 
                 let raw_svelte_text =
-                    Transpiler::to_svelte(finalized_svg_text, "css", raw_style_text.as_str());
+                    Transpiler::to_svelte(finalized_svg_text, raw_style_text.as_str());
 
                 config
                     .output_file(raw_svelte_text.as_str())
@@ -81,10 +93,7 @@ fn main() -> Result<()> {
                 let mut var_color_text = String::new();
 
                 print!("Enter CSS color: ");
-
-                std::io::stdin()
-                    .read_line(&mut css_color_text)
-                    .expect("Failed to read input.");
+                readln!(&mut css_color_text);
 
                 let css_color = match CssColor::new(css_color_text.trim()) {
                     Ok(color) => color,
@@ -95,10 +104,7 @@ fn main() -> Result<()> {
                 };
 
                 print!("Enter variable color: ");
-
-                std::io::stdin()
-                    .read_line(&mut var_color_text)
-                    .expect("Failed to read input.");
+                readln!(&mut var_color_text);
 
                 let var_color = match VarColor::new(var_color_text.trim()) {
                     Ok(color) => color,
@@ -114,10 +120,7 @@ fn main() -> Result<()> {
                 let mut svg_file_path = String::new();
 
                 print!("Enter SVG file path: ");
-
-                std::io::stdin()
-                    .read_line(&mut svg_file_path)
-                    .expect("Failed to read input.");
+                readln!(&mut svg_file_path);
 
                 config.set_svg_file_path(svg_file_path.trim());
 
@@ -127,18 +130,27 @@ fn main() -> Result<()> {
                 let mut style_file_path = String::new();
 
                 print!("Enter style file path: ");
-
-                std::io::stdin()
-                    .read_line(&mut style_file_path)
-                    .expect("Failed to read input.");
+                readln!(&mut style_file_path);
 
                 config.set_style_file_path(style_file_path.trim());
 
                 println!("Style file path successfully set.");
             }
-            Some(5) => break,
+            Some(5) => {
+                let mut output_file_path = String::new();
+
+                print!("Enter output file path: ");
+                readln!(&mut output_file_path);
+
+                config.set_output_file_path(output_file_path.trim());
+
+                println!("Output file path successfully set.");
+            }
+            Some(6) => break,
             _ => println!("Invalid option selected. Please try again."),
         }
+
+        clear!();
     }
 
     print!("Saving configuration to file... ");

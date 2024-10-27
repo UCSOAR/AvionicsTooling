@@ -27,20 +27,19 @@ impl Default for Config {
 impl Display for Config {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let color_mappings = if self.color_mappings.len() == 0 {
-            "None".to_string()
+            "\tNone".to_string()
         } else {
             self.color_mappings
                 .iter()
                 .map(|(css_color, var_color)| {
-                    format!("{} -> {}", css_color.as_str(), var_color.as_str())
+                    format!("\t{} -> {}\n", css_color.as_str(), var_color.as_str())
                 })
-                .collect::<Vec<String>>()
-                .join(", ")
+                .collect::<String>()
         };
 
         write!(
             f,
-            "Current configuration:\nStyle file path: \"{}\"\nSVG file path: \"{}\"\nOutput file path: \"{}\"\nColor mappings: {}\n",
+            "Current configuration:\nStyle file path: \"{}\"\nSVG file path: \"{}\"\nOutput file path: \"{}\"\nColor mappings:\n{}\n",
             self.style_file_path, self.svg_file_path, self.output_file_path, color_mappings
         )
     }

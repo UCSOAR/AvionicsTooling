@@ -9,7 +9,8 @@ impl Display for Options {
             "\t2 - Set color mapping",
             "\t3 - Set SVG file path",
             "\t4 - Set style file path",
-            "\t5 - Save and exit",
+            "\t5 - Set output file path",
+            "\t6 - Save and exit",
         ];
 
         write!(f, "Options:\n{}", options.join("\n"))
