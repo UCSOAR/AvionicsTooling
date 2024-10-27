@@ -9,7 +9,7 @@ use super::xml_attributes::XmlAttributes;
  * Group 2: The attributes of the SVG element.
  * Group 3: The closing bracket of the SVG element.
  */
-const SVG_OPEN_TAG_PATTERN: &str = r#"(<svg\s+)([^>]*)(>)"#;
+const SVG_OPEN_TAG_PATTERN: &str = r#"(<svg\s?+)([^>]*)(>)"#;
 
 /**
  * Pattern for matching XML attributes of a tag
@@ -47,6 +47,15 @@ pub fn parse_attributes(raw_svg_text: &str) -> Result<(XmlAttributes, String)> {
 
 mod test {
     use crate::svg::{parser::parse_attributes, xml_attributes::XmlAttributes};
+
+    #[test]
+    fn test_svg_no_attributes_is_ok() {
+        let input = r#"<svg>"#;
+        let expected = XmlAttributes::new();
+        let (attributes, _) = parse_attributes(input).unwrap();
+
+        assert_eq!(attributes, expected);
+    }
 
     #[test]
     fn test_parse_open_tag_overall_text_equals_svg_section() {
