@@ -30,7 +30,7 @@ From here, `Diagram.svelte` will be generated in the same directory as the SVG f
 
 It is essential that every color used in the SVG exported from Figma is mapped to a dynamic CSS variable. This is because the Svelte component requires these dynamic CSS variables to allow for programatic customization of theme switching.
 
-Once the Svelte component is generated, it can be copied into the `RocketControlUnitGUI` project. The `Diagram.svelte` file should be placed in the `src/components` directory.
+Once the Svelte component is generated, it can replace the existing `Diagram.svelte` file in the `RocketControlUnitGUI` project.
 
 <br />
 
